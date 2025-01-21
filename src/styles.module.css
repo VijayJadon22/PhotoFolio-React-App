@@ -35,6 +35,7 @@
     width: 90%;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    /* grid-template-columns: repeat(4,1fr); */
     gap: 10px;
     justify-items: center;
 }
@@ -44,7 +45,7 @@
     margin-bottom: 10px;
 }
 
-.addAlbumDiv{
+.addAlbumDiv {
     width: 80%;
     display: flex;
     justify-content: space-between;
@@ -53,7 +54,7 @@
 
 }
 
-.btn{
+.btn {
     padding: 8px 10px;
     font-size: 16px;
     border-radius: 5px;
@@ -65,7 +66,7 @@
 }
 
 /* Add album */
-.addAlbumContainer{
+.addAlbumContainer {
     width: 50vw;
     height: 25vh;
     border-radius: 20px;
@@ -78,13 +79,13 @@
     background-color: rgb(243, 243, 243);
 }
 
-.inputDiv{
+.inputDiv {
     display: flex;
     width: 100%;
     /* justify-content: space-around; */
 }
 
-.input{
+.input {
     height: 50px;
     width: 100%;
     border-radius: 10px 0px 0px 10px;
@@ -96,7 +97,7 @@
     color: black;
 }
 
-.addbtn{
+.addbtn {
     height: 50px;
     padding: 10px 20px;
     border-radius: 0px 10px 10px 0px;
@@ -106,4 +107,57 @@
     color: white;
     cursor: pointer;
     font-size: 16px;
+}
+
+/* notification bar */
+
+.notifcationDiv {
+    width: 300px;
+    height: 70px;
+    position: fixed;
+    top: 20px;
+    right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    background-color: white;
+    box-shadow: 0px 0px 5px 0px grey;
+    border-radius: 10px;
+    animation: slideIn 1s ease-in-out forwards, stayOnScreen 5s linear 1s forwards, slideOut 1s ease-in-out 5s forwards;
+    z-index: 100;
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateX(300px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes stayOnScreen {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(300px);
+        opacity: 0;
+    }
 }
