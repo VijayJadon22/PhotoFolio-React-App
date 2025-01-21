@@ -1,0 +1,37 @@
+.navContainer{
+    height: 75px;
+    background-color: aqua;
+    width: 100%;
+}
+
+.albumFolder{
+    width: 200px;
+    height: 200px;
+    border: 1px solid rgb(188, 188, 188);
+    box-shadow: 0px 0px 5px 0px grey;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
+}
+
+.albumFolder:hover{
+    scale: 1.04;
+    box-shadow: 0px 0px 10px 0px orange;
+}
+
+.albumContainer {
+    margin-top: 40px;
+    width: 90%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));/* Ensures 5 columns */
+    gap: 10px;
+    justify-items: center;
+}
+
+.defaultAlbumImage{
+    width: 80%;
+    margin-bottom: 10px;
+}
