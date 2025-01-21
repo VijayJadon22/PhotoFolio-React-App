@@ -1,10 +1,10 @@
-.navContainer{
+.navContainer {
     height: 75px;
     background-color: aqua;
     width: 100%;
 }
 
-.albumFolder{
+.albumFolder {
     width: 200px;
     height: 200px;
     border: 1px solid rgb(188, 188, 188);
@@ -14,24 +14,96 @@
     flex-direction: column;
     align-items: center;
     cursor: pointer;
+    padding: 10px;
     transition: all 0.5s ease-in-out;
 }
 
-.albumFolder:hover{
+.albumFolder:hover {
     scale: 1.04;
     box-shadow: 0px 0px 10px 0px orange;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    align-items: center;
 }
 
 .albumContainer {
     margin-top: 40px;
     width: 90%;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));/* Ensures 5 columns */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 10px;
     justify-items: center;
 }
 
-.defaultAlbumImage{
+.defaultAlbumImage {
     width: 80%;
     margin-bottom: 10px;
+}
+
+.addAlbumDiv{
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+
+}
+
+.btn{
+    padding: 8px 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    background-color: red;
+    color: white;
+    cursor: pointer;
+}
+
+/* Add album */
+.addAlbumContainer{
+    width: 50vw;
+    height: 25vh;
+    border-radius: 20px;
+    margin: 20px;
+    box-shadow: 0px 0px 5px 0px grey;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    background-color: rgb(243, 243, 243);
+}
+
+.inputDiv{
+    display: flex;
+    width: 100%;
+    /* justify-content: space-around; */
+}
+
+.input{
+    height: 50px;
+    width: 100%;
+    border-radius: 10px 0px 0px 10px;
+    outline: none;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    color: black;
+}
+
+.addbtn{
+    height: 50px;
+    padding: 10px 20px;
+    border-radius: 0px 10px 10px 0px;
+    outline: none;
+    border: none;
+    background-color: rgb(59, 128, 247);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
 }
