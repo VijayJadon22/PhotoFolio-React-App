@@ -3,14 +3,10 @@ import styles from "../styles.module.css";
 import { firestore } from "../firebase";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import AddAlbum from "./AddAlbum";
+import Album from "./Album";
 
 const Home = () => {
-  const [albums, setAlbums] = useState([
-    "Vijay",
-    "New Folder",
-    "Trip",
-    "School",
-  ]);
+  const [albums, setAlbums] = useState([]);
   const [currentAlbum, setCurrentAlbum] = useState(null);
   const [newAlbum, setNewAlbum] = useState(false);
   const [notification, setNotification] = useState("");
@@ -44,6 +40,17 @@ const Home = () => {
       setNotification("");
     }, 6000);
   };
+
+  const openAlbum = (albumId, albumName) => {
+    console.log(albumId,albumName)
+    setNewAlbum(false);
+    setCurrentAlbum({albumId,albumName});
+  };
+
+  const goBack = () => {
+    console.log("inside");
+    setCurrentAlbum(null);
+  }
   return (
     <>
       {notification && (
@@ -58,25 +65,27 @@ const Home = () => {
       )}
       {newAlbum && <AddAlbum addAlbum={addNewAlbum} />}
       {currentAlbum ? (
-        <h1>will display particular album</h1>
+        <Album album={currentAlbum} goBack={goBack}  />
       ) : (
         <div className={styles.container}>
           <div className={styles.addAlbumDiv}>
             <h1>Your Albums</h1>
-            {newAlbum ? (
-              <button onClick={() => setNewAlbum(false)} className={styles.btn}>
-                Close
-              </button>
-            ) : (
-              <button onClick={() => setNewAlbum(true)} className={styles.btn}>
-                Add Album
-              </button>
-            )}
+
+            <button
+              onClick={() => setNewAlbum(!newAlbum)}
+              className={styles.btn}
+            >
+              {newAlbum ? "Close" : "Add Album"}
+            </button>
           </div>
           <div className={styles.albumContainer}>
             {albums.map((ele, index) => {
               return (
-                <div key={index} className={styles.albumFolder}>
+                <div
+                  onClick={() => openAlbum(ele.id,ele.name)}
+                  key={index}
+                  className={styles.albumFolder}
+                >
                   <img
                     className={styles.defaultAlbumImage}
                     src="https://th.bing.com/th/id/OIP.3LvSVOUoDxdPmeOhmquxNgHaHa?rs=1&pid=ImgDetMain"
