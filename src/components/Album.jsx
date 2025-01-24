@@ -3,31 +3,42 @@ import styles from "../styles.module.css";
 import AddImage from "./AddImage";
 import { firestore } from "../firebase";
 import { addDoc, collection, getDocs } from "firebase/firestore";
+import FullImageView from "./Image";
 
 const Album = (props) => {
   const [images, setImages] = useState([]);
   const [addImageVisible, setAddImageVisible] = useState(false);
   const [inputVisible, setInputVisible] = useState(false);
   const [filteredImages, setFilteredImages] = useState([]);
-  console.log(props);
+  const [imageOpened, setImageOpened] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(null);
+
+  // console.log(imageOpened);
 
   useEffect(() => {
+    console.log("Props:", props);
+    // console.log("props.album.albumId: ", props.album.albumId);
     const collectionRef = collection(
       firestore,
       "albums",
       props.album.albumId,
       "images"
     );
-    getDocs(collectionRef).then((data) => {
-      const allImages = data.docs.map((doc) => {
-        return {
-          id: doc.id,
-          title: doc.data().title,
-          url: doc.data().url,
-        };
-      });
-      setImages(allImages);
-      setFilteredImages(allImages); // Initialize filteredImages with allImages
+
+    // console.log(collectionRef);
+    getDocs(collectionRef).then((querySnapshot) => {
+      // console.log("Query Snapshot:", querySnapshot);
+      if (!querySnapshot.empty) {
+        const allImages = querySnapshot.docs.map((doc) => {
+          return {
+            id: doc.id,
+            title: doc.data().title,
+            url: doc.data().url,
+          };
+        });
+        setImages(allImages);
+        setFilteredImages(allImages); // Initialize filteredImages with allImages
+      }
     });
   }, [props.album.albumId]);
 
@@ -35,6 +46,9 @@ const Album = (props) => {
     //add images to the images array
     setImages([{ title, url }, ...images]);
     setFilteredImages([{ title, url }, ...images]);
+
+    // Show notification
+    props.setNotification("Image Added Successfully");
 
     // add new image to the firstore databse
     const collectionRef = collection(
@@ -48,6 +62,11 @@ const Album = (props) => {
       url,
       albumId: props.album.albumId,
     });
+
+    //Hide notification
+    setTimeout(() => {
+      props.setNotification("");
+    }, 6000);
   };
 
   const goBack = () => {
@@ -68,8 +87,42 @@ const Album = (props) => {
     }
   };
 
+  const openImage = (index) => {
+    setImageOpened(true);
+    setCurrentImageIndex(index);
+  };
+
+  const handlePrev = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? prevIndex : prevIndex - 1
+    );
+  };
+
+  const handleNext = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === filteredImages.length - 1 ? prevIndex : prevIndex + 1
+    );
+  };
+
+  const handleImageClose = () => {
+    setImageOpened(false);
+    setCurrentImageIndex(null);
+  };
+
+  const handleFullScreen = () => {};
+
   return (
     <div className={styles.albumContainerDiv}>
+      {imageOpened && (
+        <FullImageView
+          currentImage={filteredImages[currentImageIndex]}
+          handleNext={handleNext}
+          handlePrev={handlePrev}
+          handleImageClose={handleImageClose}
+          setImageOpened={openImage}
+        />
+      )}
+
       {addImageVisible && <AddImage addNewImage={addNewImage} />}
       <div className={styles.albumHeading}>
         <div className={styles.divContainer}>
@@ -113,7 +166,11 @@ const Album = (props) => {
       <div className={styles.albumDiv}>
         {filteredImages.length > 0 ? (
           filteredImages.map((image, index) => (
-            <div key={index} className={styles.imageCardDiv}>
+            <div
+              onClick={() => openImage(index)}
+              key={index}
+              className={styles.imageCardDiv}
+            >
               <img src={image.url} />
               <p className={styles.imageContent}>{image.title}</p>
             </div>

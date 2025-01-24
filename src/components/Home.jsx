@@ -26,14 +26,16 @@ const Home = () => {
   }, []);
 
   const addNewAlbum = async (albumName) => {
-    setAlbums([{ name: albumName }, ...albums]);
+    // setAlbums([{ name: albumName }, ...albums]);
+    // Show notification
     setNotification("Album added successfully");
 
     //   add new album to the firstore databse
     const collectionRef = collection(firestore, "albums");
-    await addDoc(collectionRef, { albumName });
+    const newDoc = await addDoc(collectionRef, { albumName });
+    setAlbums([{ id: newDoc.id, name: albumName }, ...albums]);
 
-    // Show notification
+    console.log(newDoc.id);
 
     // Hide notification after 5 seconds
     setTimeout(() => {
@@ -42,15 +44,15 @@ const Home = () => {
   };
 
   const openAlbum = (albumId, albumName) => {
-    console.log(albumId,albumName)
+    // console.log(albumId, albumName);
     setNewAlbum(false);
-    setCurrentAlbum({albumId,albumName});
+    setCurrentAlbum({ albumId, albumName });
   };
 
   const goBack = () => {
     console.log("inside");
     setCurrentAlbum(null);
-  }
+  };
   return (
     <>
       {notification && (
@@ -65,7 +67,11 @@ const Home = () => {
       )}
       {newAlbum && <AddAlbum addAlbum={addNewAlbum} />}
       {currentAlbum ? (
-        <Album album={currentAlbum} goBack={goBack}  />
+        <Album
+          album={currentAlbum}
+          setNotification={setNotification}
+          goBack={goBack}
+        />
       ) : (
         <div className={styles.container}>
           <div className={styles.addAlbumDiv}>
@@ -80,9 +86,10 @@ const Home = () => {
           </div>
           <div className={styles.albumContainer}>
             {albums.map((ele, index) => {
+              // console.log("ele.id:", ele.id, "ele.name: ", ele.name);
               return (
                 <div
-                  onClick={() => openAlbum(ele.id,ele.name)}
+                  onClick={() => openAlbum(ele.id, ele.name)}
                   key={index}
                   className={styles.albumFolder}
                 >
