@@ -2,8 +2,21 @@ import React, { useEffect, useState } from "react";
 import styles from "../styles.module.css";
 import AddImage from "./AddImage";
 import { firestore } from "../firebase";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 import FullImageView from "./Image";
+
+// react icon
+import { MdDeleteForever } from "react-icons/md";
+import { MdModeEditOutline } from "react-icons/md";
+import { SlOptionsVertical } from "react-icons/sl";
+import UpdateImage from "./UpdateImage";
 
 const Album = (props) => {
   const [images, setImages] = useState([]);
@@ -12,6 +25,9 @@ const Album = (props) => {
   const [filteredImages, setFilteredImages] = useState([]);
   const [imageOpened, setImageOpened] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(null);
+  const [optionsOpened, setOptionsOpened] = useState({});
+  const [updateImage, setUpdateImage] = useState(false);
+  const [updateImageValue, setUpdateImageValue] = useState(null);
 
   // console.log(imageOpened);
 
@@ -109,10 +125,100 @@ const Album = (props) => {
     setCurrentImageIndex(null);
   };
 
-  const handleFullScreen = () => {};
+  const toggleOptions = (index) => {
+    setOptionsOpened((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index],
+    }));
+  };
+  const toggleOptionsOff = (index) => {
+    if (optionsOpened[index] === true) {
+      setOptionsOpened((prevState) => ({
+        ...prevState,
+        [index]: false,
+      }));
+    }
+  };
+
+  const handleDeleteImage = async (imageId) => {
+    const updatedFilteredImages = filteredImages.filter(
+      (image) => image.id !== imageId
+    );
+    setFilteredImages(updatedFilteredImages);
+    setImages(updatedFilteredImages);
+
+    //set notification for image deleted
+    props.setNotification("Image Deleted Successfully");
+
+    //delete image from the firestore database
+    const imageRef = doc(
+      firestore,
+      "albums",
+      props.album.albumId,
+      "images",
+      imageId
+    );
+    await deleteDoc(imageRef);
+
+    // Hide notification after 6 seconds
+    setTimeout(() => {
+      props.setNotification("");
+    }, 6000);
+  };
+
+  const handleUpdateImage = (title, url, id, index) => {
+    if (updateImage === false) {
+      setUpdateImageValue({ title: title, url: url, id: id, index: index });
+    }
+    setUpdateImage(!updateImage);
+    setAddImageVisible(false);
+  };
+
+  const updateImageInfo = async (title, url, imageId, index) => {
+    const updatedImages = [...filteredImages];
+    updatedImages[index] = { title, url, id: imageId };
+    setFilteredImages(updatedImages);
+    setImages(updatedImages);
+
+    //set notification for image updation
+    props.setNotification("Image Updated Successfully");
+
+    //update in firestore db
+    const docRef = doc(
+      firestore,
+      "albums",
+      props.album.albumId,
+      "images",
+      imageId
+    );
+    await updateDoc(docRef, {
+      title: title,
+      url: url,
+      albumId: props.album.albumId,
+    });
+
+    //hide notification after 6 seconds
+    setTimeout(() => {
+      props.setNotification("");
+    }, 6000);
+  };
+
+  const handleUpdateAddVisibility = () => {
+    if (updateImage === true) {
+      setUpdateImage(false);
+      return;
+    }
+    setAddImageVisible(!addImageVisible);
+  };
 
   return (
     <div className={styles.albumContainerDiv}>
+      {updateImage && (
+        <UpdateImage
+          image={updateImageValue}
+          updateImageInfo={updateImageInfo}
+        />
+      )}
       {imageOpened && (
         <FullImageView
           currentImage={filteredImages[currentImageIndex]}
@@ -155,10 +261,14 @@ const Album = (props) => {
             />
           </div>
           <button
-            onClick={() => setAddImageVisible(!addImageVisible)}
+            // onClick={() => setAddImageVisible(!addImageVisible)}
+            onClick={handleUpdateAddVisibility}
             className={styles.btn}
           >
-            {addImageVisible ? "Cancel" : "Add Image"}
+            {/* {addImageVisible ? "Cancel" : "Add Image"} */}
+            {addImageVisible ? "Cancel" : updateImage ? "Close" : "Add Image"}
+
+            {/* {updateImage ? "Cancel" : "Add Image"} */}
           </button>
         </div>
       </div>
@@ -167,16 +277,45 @@ const Album = (props) => {
         {filteredImages.length > 0 ? (
           filteredImages.map((image, index) => (
             <div
-              onClick={() => openImage(index)}
+              onMouseLeave={() => toggleOptionsOff(index)}
               key={index}
               className={styles.imageCardDiv}
             >
-              <img src={image.url} />
+              <img
+                onClick={() => openImage(index)}
+                src={image.url}
+                alt="photo-image"
+              />
               <p className={styles.imageContent}>{image.title}</p>
+              <SlOptionsVertical
+                onClick={() => toggleOptions(index)}
+                className={styles.optionsIcon}
+              />
+              {optionsOpened[index] && (
+                <div className={styles.optionsDiv}>
+                  <h3>
+                    <MdModeEditOutline
+                      onClick={() =>
+                        handleUpdateImage(
+                          image.title,
+                          image.url,
+                          image.id,
+                          index
+                        )
+                      }
+                    />
+                  </h3>
+                  <h3>
+                    <MdDeleteForever
+                      onClick={() => handleDeleteImage(image.id)}
+                    />
+                  </h3>
+                </div>
+              )}
             </div>
           ))
         ) : (
-          <p>No Image</p>
+          <h1 style={{ textAlign: "center" }}>No Image</h1>
         )}
       </div>
     </div>

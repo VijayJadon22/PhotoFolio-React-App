@@ -37,7 +37,7 @@ const Home = () => {
 
     console.log(newDoc.id);
 
-    // Hide notification after 5 seconds
+    // Hide notification after 6 seconds
     setTimeout(() => {
       setNotification("");
     }, 6000);
